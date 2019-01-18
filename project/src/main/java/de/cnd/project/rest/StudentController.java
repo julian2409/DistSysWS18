@@ -1,0 +1,61 @@
+package de.cnd.project.rest;
+
+import de.cnd.project.data.GradeRepository;
+import de.cnd.project.data.StudentRepository;
+import de.cnd.project.data.model.Grade;
+import de.cnd.project.data.model.Student;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+public class StudentController {
+
+    private final StudentRepository studentRepository;
+    private final GradeRepository gradeRepository;
+
+    StudentController(StudentRepository repository, GradeRepository gradeRepository) {
+        this.studentRepository = repository;
+        this.gradeRepository = gradeRepository;
+    }
+
+    @GetMapping("/students")
+    public List<Student> getAllStudents() {
+        return studentRepository.findAll();
+    }
+
+    @GetMapping("/students/{studentId}")
+    Student getStudentByMatrNr(@PathVariable Long matrikelNummer) {
+        return studentRepository.findById(matrikelNummer)
+                .orElseThrow(() -> new StudentNotFoundException(matrikelNummer));
+    }
+
+    @GetMapping("/students/{studentId}/grades")
+    List<Grade> getAllGrades(@PathVariable Long studentId) {
+        return gradeRepository.findByStudent(studentRepository.findById(studentId)
+                .orElseThrow(() -> new StudentNotFoundException(studentId)));
+    }
+
+    @PostMapping("/students")
+    Student newStudent(@RequestBody Student newStudent) {
+        return studentRepository.save(newStudent);
+    }
+
+    @PutMapping("/students/{studentId}")
+    Student modifyStudent(@RequestBody Student newStudent, @PathVariable Long matrikelNummer) {
+        return studentRepository.findById(matrikelNummer)
+                .map(student -> {
+                    student.setName(newStudent.getName());
+                    student.setFirstName(newStudent.getFirstName());
+                    return studentRepository.save(student);
+                }).orElseGet(() -> {
+                    newStudent.setStudentId(matrikelNummer);
+                    return studentRepository.save(newStudent);
+                });
+    }
+
+    @DeleteMapping("/students/{studentId}")
+    void deleteStudent(@PathVariable Long matrikelNummer) {
+        studentRepository.deleteById(matrikelNummer);
+    }
+}
