@@ -25,9 +25,9 @@ public class StudentController {
     }
 
     @GetMapping("/students/{studentId}")
-    Student getStudentByMatrNr(@PathVariable Long matrikelNummer) {
-        return studentRepository.findById(matrikelNummer)
-                .orElseThrow(() -> new StudentNotFoundException(matrikelNummer));
+    Student getStudentByMatrNr(@PathVariable Long studentId) {
+        return studentRepository.findById(studentId)
+                .orElseThrow(() -> new StudentNotFoundException(studentId));
     }
 
     @GetMapping("/students/{studentId}/grades")
@@ -42,20 +42,20 @@ public class StudentController {
     }
 
     @PutMapping("/students/{studentId}")
-    Student modifyStudent(@RequestBody Student newStudent, @PathVariable Long matrikelNummer) {
-        return studentRepository.findById(matrikelNummer)
+    Student modifyStudent(@RequestBody Student newStudent, @PathVariable Long studentId) {
+        return studentRepository.findById(studentId)
                 .map(student -> {
                     student.setName(newStudent.getName());
                     student.setFirstName(newStudent.getFirstName());
                     return studentRepository.save(student);
                 }).orElseGet(() -> {
-                    newStudent.setStudentId(matrikelNummer);
+                    newStudent.setStudentId(studentId);
                     return studentRepository.save(newStudent);
                 });
     }
 
     @DeleteMapping("/students/{studentId}")
-    void deleteStudent(@PathVariable Long matrikelNummer) {
-        studentRepository.deleteById(matrikelNummer);
+    void deleteStudent(@PathVariable Long studentId) {
+        studentRepository.deleteById(studentId);
     }
 }
