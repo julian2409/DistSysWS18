@@ -1,3 +1,6 @@
+# Make sure to rename the jar correctly if necessary
+# From project root directory create image with 'docker build -t project .'
+# Run with 'docker run -d --network="host" -p 127.0.0.1:80:8080 project'
 FROM openjdk:8-jre-alpine
 WORKDIR /
 ADD target/project.jar project.jar
